@@ -18,15 +18,16 @@ MODULE_VERSION("0.1");
  * ssize_t can't fit the number > 92
  */
 #define MAX_LENGTH 92
-
 static dev_t fib_dev = 0;
 static struct cdev *fib_cdev;
 static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
+/* FIXME: C99 variable-length array (VLA) is not allowed in Linux kernel. */
+/*
 static long long fib_sequence(long long k)
 {
-    /* FIXME: C99 variable-length array (VLA) is not allowed in Linux kernel. */
+
     long long f[k + 2];
 
     f[0] = 0;
@@ -37,6 +38,28 @@ static long long fib_sequence(long long k)
     }
 
     return f[k];
+}
+*/
+
+/* Fast Doubling with clz */
+static uint64_t fib_sequence(uint64_t k)
+{
+    uint64_t f[2] = {0, 1};
+    uint64_t count = 63 - __builtin_clz(k);
+
+    for (unsigned int mask = 1 << count; mask; mask >>= 1) {
+        uint64_t a = f[0] * (2 * f[1] - f[0]);  // F(2k+1) = F(k+1)^2+F(k)^2
+        uint64_t b = f[0] * f[0] + f[1] * f[1];  // F(2k)   = F(k)[2F(k+1)−F(k)]
+
+        if ((mask & k)) {
+            f[0] = b;
+            f[1] = a + b;
+        } else {
+            f[0] = a;
+            f[1] = b;
+        }
+    }
+    return f[0];
 }
 
 static int fib_open(struct inode *inode, struct file *file)
