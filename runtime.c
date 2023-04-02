@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     for (int i = 0; i <= offset; i++) {
         lseek(fd, i, SEEK_SET);
         long long sz = write(fd, write_buf, strlen(write_buf));
-        printf("%lld ns\n", sz);
+        printf("%d %lld ns\n", i, sz);
     }
 
     close(fd);

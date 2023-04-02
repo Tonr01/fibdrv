@@ -114,7 +114,7 @@ static ssize_t fib_write(struct file *file,
                          size_t size,
                          loff_t *offset)
 {
-    int n = 2;
+    int n = 1;
     fib_time_proxy(*offset, n);
     return ktime_to_ns(kt);
 }
