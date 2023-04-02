@@ -24,11 +24,10 @@ static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
 /* FIXME: C99 variable-length array (VLA) is not allowed in Linux kernel. */
-/*
-static long long fib_sequence(long long k)
-{
 
-    long long f[k + 2];
+static uint64_t fib_sequence_dp(uint64_t k)
+{
+    uint64_t f[k + 2];
 
     f[0] = 0;
     f[1] = 1;
@@ -39,10 +38,9 @@ static long long fib_sequence(long long k)
 
     return f[k];
 }
-*/
 
 /* Fast Doubling with clz */
-static uint64_t fib_sequence(uint64_t k)
+static uint64_t fib_sequence_fast_doubling(uint64_t k)
 {
     uint64_t f[2] = {0, 1};
     uint64_t count = 63 - __builtin_clz(k);
@@ -62,6 +60,16 @@ static uint64_t fib_sequence(uint64_t k)
     return f[0];
 }
 
+static uint64_t fib_sequence(uint64_t k, int n)
+{
+    switch (n) {
+    case 1:
+        return fib_sequence_dp(k);
+    default:
+        return fib_sequence_fast_doubling(k);
+    }
+}
+
 static int fib_open(struct inode *inode, struct file *file)
 {
     if (!mutex_trylock(&fib_mutex)) {
@@ -77,22 +85,38 @@ static int fib_release(struct inode *inode, struct file *file)
     return 0;
 }
 
+/* ktime_t to calculate fib time */
+static ktime_t kt;
+
+static uint64_t fib_time_proxy(uint64_t k, int n)
+{
+    kt = ktime_get();
+    uint64_t result = fib_sequence(k, n);
+    kt = ktime_sub(ktime_get(), kt);
+
+    return result;
+}
+
 /* calculate the fibonacci number at given offset */
 static ssize_t fib_read(struct file *file,
                         char *buf,
                         size_t size,
                         loff_t *offset)
 {
-    return (ssize_t) fib_sequence(*offset);
+    int n = 1;
+    return (ssize_t) fib_sequence(*offset, n);
 }
 
 /* write operation is skipped */
+/* Calculate the runtime */
 static ssize_t fib_write(struct file *file,
                          const char *buf,
                          size_t size,
                          loff_t *offset)
 {
-    return 1;
+    int n = 2;
+    fib_time_proxy(*offset, n);
+    return ktime_to_ns(kt);
 }
 
 static loff_t fib_device_lseek(struct file *file, loff_t offset, int orig)

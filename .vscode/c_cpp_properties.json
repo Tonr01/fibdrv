@@ -6,9 +6,9 @@
                 "${workspaceFolder}/**",
                 "/usr/include",
                 "/usr/local/include",
-                "/usr/src/linux-headers-5.19.0-35-generic/include",
-                "/usr/src/linux-headers-5.19.0-35-generic/arch/x86/include",
-                "/usr/src/linux-headers-5.19.0-35-generic/arch/x86/include/generated",
+                "/usr/src/linux-headers-5.19.0-38-generic/include",
+                "/usr/src/linux-headers-5.19.0-38-generic/arch/x86/include",
+                "/usr/src/linux-headers-5.19.0-38-generic/arch/x86/include/generated",
                 "/usr/lib/gcc/x86_64-linux-gnu/11/include"
             ],
             "defines": [
