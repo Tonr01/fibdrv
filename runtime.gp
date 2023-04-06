@@ -6,5 +6,5 @@ set output 'runtime_result.png'
 set key left
 
 plot \
-"data1" using 1:2 with linespoints linewidth 2 title "DP", \
-"data2" using 1:2 with linespoints linewidth 2 title "Fast Doubling" \
+"runtime_data" using 1:2 with linespoints linewidth 2 title "DP", \
+"runtime_data" using 1:3 with linespoints linewidth 2 title "Fast Doubling" \

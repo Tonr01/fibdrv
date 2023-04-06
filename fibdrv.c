@@ -6,6 +6,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
+#include "bignumber.h"
 
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -63,10 +64,12 @@ static uint64_t fib_sequence_fast_doubling(uint64_t k)
 static uint64_t fib_sequence(uint64_t k, int n)
 {
     switch (n) {
-    case 1:
+    case 0:
         return fib_sequence_dp(k);
+        break;
     default:
         return fib_sequence_fast_doubling(k);
+        break;
     }
 }
 
@@ -114,8 +117,14 @@ static ssize_t fib_write(struct file *file,
                          size_t size,
                          loff_t *offset)
 {
-    int n = 1;
-    fib_time_proxy(*offset, n);
+    switch (size) {
+    case 0:
+        fib_time_proxy(*offset, 0);
+        break;
+    default:
+        fib_time_proxy(*offset, 1);
+        break;
+    }
     return ktime_to_ns(kt);
 }
 

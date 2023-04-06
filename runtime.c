@@ -21,8 +21,9 @@ int main(int argc, char **argv)
     /* Output the runtime */
     for (int i = 0; i <= offset; i++) {
         lseek(fd, i, SEEK_SET);
-        long long sz = write(fd, write_buf, strlen(write_buf));
-        printf("%d %lld ns\n", i, sz);
+        long long sz1 = write(fd, write_buf, 0);
+        long long sz2 = write(fd, write_buf, 1);
+        printf("%d %lld %lld\n", i, sz1, sz2);
     }
 
     close(fd);
