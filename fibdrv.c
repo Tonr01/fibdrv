@@ -6,7 +6,6 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
-#include "bignumber.h"
 
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -25,7 +24,7 @@ static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
 /* FIXME: C99 variable-length array (VLA) is not allowed in Linux kernel. */
-
+/* Easy fib_sequence with dynamic programming */
 static uint64_t fib_sequence_dp(uint64_t k)
 {
     uint64_t f[k + 2];
@@ -119,10 +118,10 @@ static ssize_t fib_write(struct file *file,
 {
     switch (size) {
     case 0:
-        fib_time_proxy(*offset, 0);
+        fib_time_proxy(*offset, 0);  // fib_sequence with dynamic programming
         break;
     default:
-        fib_time_proxy(*offset, 1);
+        fib_time_proxy(*offset, 1);  // Fast Doubling with clz
         break;
     }
     return ktime_to_ns(kt);
